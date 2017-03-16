@@ -1,0 +1,17 @@
+{
+  "name": "maths_system",
+  "version": "0.1.0",
+  "description": "a simple system for maintaining maths competiton results",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/IvoDD/ResultsSystem/"
+  },
+  "author": "Ivo Dilov",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "express": "^4.14.0",
+    "jquery": "^3.2.0",
+    "socket.io": "^1.7.2"
+  }
+}
