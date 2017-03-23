@@ -1,6 +1,14 @@
 var exports = module.exports = {};
 
+var bodyParser = require("body-parser");
+
 exports.handleGets = function(express, app){
+    
+    app.use(bodyParser.urlencoded({
+        extended: true
+    }));
+
+    app.use(bodyParser.json());
     
     //app.use('/api', api); // redirect API calls
     //app.use('/', express.static(__dirname + '/www')); // redirect root
@@ -10,9 +18,9 @@ exports.handleGets = function(express, app){
     
     var path = __dirname + '/views';
 
-    app.get('/', function(req, res){
+    /*app.get('/', function(req, res){
         res.sendFile(path + "/index.html");
-    });
+    });*/
 
     app.get('/template.css', function(req, res){
         res.sendFile(path + "/template.css");

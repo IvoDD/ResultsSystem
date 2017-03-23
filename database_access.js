@@ -1,12 +1,7 @@
 var exports = module.exports;
 
 var mysql = require('mysql');
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'jjkofajj',
-    database: 'cake_results_test'
-});
+
 
 class Competitor{
     constructor(id, name){
@@ -18,9 +13,7 @@ class Competitor{
 
 exports.Competitor = Competitor;
 
-connection.connect();
-
-exports.loadResults = function(comp){
+exports.loadResults = function(connection, comp){
     connection.query("SELECT * FROM competitors", function(err, rows, fields){
         for (let i=0; rows[i]!=undefined; ++i){
             comp[rows[i].id] = new Competitor(rows[i].id, rows[i].name);

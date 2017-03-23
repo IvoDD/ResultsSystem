@@ -49,9 +49,37 @@ connAdmins.query("SHOW DATABASES LIKE '" + dbAdmins + "'", function(err, rows, f
     }
 });
 
-//connection.end();
-
 function startServer(){
+    var gets = require('./get_handler.js');
+    gets.handleGets(express, app);
+    
+    app.get('/',function(req, res){
+        res.sendFile(__dirname + '/views/admins.html');
+    });
+    
+    app.get('/admins.js',function(req, res){
+        res.sendFile(__dirname + '/views/admins.js');
+    });
+    
+    app.post('/register', function(req, res){
+        let current;
+        current = new Admin(connAdmins, req.body.username, req.body.password, 1, function(success){
+            if (success){res.send("Success");}
+            else{res.send("Username taken");}
+        });
+    });
+    
+    var Admin = require('./Admin.js').Admin;
+    connAdmins.changeUser({"database": "admins"});
+    
+    io.on('connection', function(socket){
+        let current;
+        socket.on('register', function(username, password){
+            
+        });
+        
+    });
+    
     http.listen(4000, function(){
         console.log("admin signup started on: 127.0.0.1:4000"); 
     });
