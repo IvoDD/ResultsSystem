@@ -27,7 +27,20 @@ exports.loadResults = function(connection, comp){
 }
 
 exports.changeResult = function(connection, id, problem, value, admin){
-    connection.query("UPDATE results SET result = ? WHERE cid = ? AND pid = ?", [value, id, problem], function(err){
-        if (err){console.log(err);}
+    connection.query("SELECT * FROM results WHERE cid = ? AND pid = ?", [id, problem+1], function(err, rows, fields){
+        if (err){throw err;}
+        if (rows.length == 1){
+            connection.query("UPDATE results SET result = ? WHERE cid = ? AND pid = ?", [value, id, problem+1], function(err){
+                if (err){throw err;}
+            });
+        }
+        else if(rows.length == 0){
+            connection.query("INSERT INTO results (cid, pid, result) VALUES (?, ?, ?)", [id, problem+1, value], function(err){
+                if (err){throw err;}
+            });
+        }
+        else{
+            console.log("More than one entry in results for a competitor and problem", id, problem+1);
+        }
     });
 }
