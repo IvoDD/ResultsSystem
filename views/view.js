@@ -1,5 +1,3 @@
-function updateResults(){}
-
 var lastActive = 'r';
 var blocks = {'r': "block_results",
               'r1': "block_zad1",
@@ -9,6 +7,12 @@ var blocks = {'r': "block_results",
               'r5': "block_zad5",
               'r6': "block_zad6",
               'l': "block_login"};
+
+var lastProblem = 0, lastId = 0, hiksche = 0;
+
+window.addEventListener('keydown', function(event){
+    if (event.key=="Escape"){hideInput();}
+})
 
 function clear(){
     document.getElementById(lastActive).className="";
@@ -81,6 +85,23 @@ function parse(a){
     if (a==undefined){return '-';}
     return a;
 }
+function parse2(a){
+    if (a==undefined){return '';}
+    return a;
+}
+
+function updateCompetitor(competitor){
+    let row = document.getElementById('re' + competitor.id);
+    let child = row.firstChild.nextSibling;
+    child.innerHTML = competitor.name;
+    for (let i=0; i<6; ++i){
+        child = child.nextSibling;
+        child.innerHTML = parse(competitor.p[i]);
+        document.getElementById('z'+(i+1)+competitor.id).lastChild.innerHTML = parse(competitor.p[i]);
+    }
+    child.nextSibling.innerHTML = competitor.overall;
+    updatePos(competitor);
+}
 
 function insertCompetitor(competitor){
     ++numComp;
@@ -103,6 +124,40 @@ function insertCompetitor(competitor){
                                         "<td>" + competitor.name + "</td>" + 
                                         "<td>" + parse(competitor.p[i]) + "</td>" + 
                                         "</tr>");
+        document.getElementById('z' + (i+1) + competitor.id).addEventListener('click', function(){editResult(i+1, competitor.id)});
     }
     updatePos(competitor);
+}
+
+function hideInput(problem=lastProblem, id=lastId){
+    //console.log('hiding');
+    let row = document.getElementById('z' + problem + id);
+    if (row){
+        row.lastChild.innerHTML = parse(competitors[id].p[problem-1]);
+    }
+    lastProblem = lastId = 0;
+}
+
+function editResult(problem, id){
+    if (hiksche){hiksche=0; return;}
+    //console.log('editing', problem, id);
+    if (!isAdmin || problem==lastProblem && id==lastId){return;}
+    hideInput();
+    lastProblem = problem; lastId = id;
+    let row = document.getElementById('z' + problem + id);
+    row.lastChild.innerHTML = "<form onsubmit='return updateRes(" +problem+ ", " +id+ ")' style='display:inline'>" +
+                              "<input type='number' min='0' max='10' id='currentResult' autofocus value='"+ parse2(competitors[id].p[problem-1]) +"'>" + 
+                              "<input type='submit' value='tickche'>" + 
+                              "</form>" + 
+                              "<button style='display:inline' onclick='hideInput();hiksche=1;'>hiksche</button>";
+    document.getElementById('currentResult').select();
+}
+
+function getSigninData(){
+    let ans = {};
+    ans.username = document.getElementById('inputEmail').value;
+    document.getElementById('inputEmail').value = "";
+    ans.password = document.getElementById('inputPassword').value;
+    document.getElementById('inputPassword').value = "";
+    return ans;
 }

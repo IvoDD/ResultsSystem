@@ -188,18 +188,13 @@
     </div>
       
     <div class="container" id="block_login" style="display: none;">
-        <form class="form-signin">
+        <form class="form-signin" onsubmit="return login();">
             <h2 class="form-signin-heading">Log in (for admins)</h2>
             <label for="inputEmail" class="sr-only">Username</label>
             <input type="text" id="inputEmail" class="form-control" placeholder="Username" required autofocus>
             <label for="inputPassword" class="sr-only">Password</label>
             <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" value="remember-me"> Remember me
-              </label>
-            </div>
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <input class="btn btn-lg btn-primary btn-block" type="submit" value="Sign in">
         </form>
     </div>
     <!-- Bootstrap core JavaScript

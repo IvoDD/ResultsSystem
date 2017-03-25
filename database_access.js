@@ -25,3 +25,9 @@ exports.loadResults = function(connection, comp){
         }
     });
 }
+
+exports.changeResult = function(connection, id, problem, value, admin){
+    connection.query("UPDATE results SET result = ? WHERE cid = ? AND pid = ?", [value, id, problem], function(err){
+        if (err){console.log(err);}
+    });
+}
