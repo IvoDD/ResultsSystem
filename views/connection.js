@@ -26,7 +26,10 @@ socket.on('login', function(success){
 });
 
 function updateRes(problem, id){
-    socket.emit('updateResult',id, problem-1, document.getElementById('currentResult').value);
+    let value = document.getElementById('currentResult').value;
+    if (value != undefined && value != "" && value<=10 && value>=0){
+        socket.emit('updateResult',id, problem-1, value);
+    }
     hideInput();
     return false;
 }

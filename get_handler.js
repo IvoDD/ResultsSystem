@@ -36,4 +36,8 @@ exports.handleGets = function(express, app){
     app.get('/connection.js', function(req, res){
         res.sendFile(path + "/connection.js");
     });
+    
+    app.get('/*.png', function(req, res){
+        res.sendFile(path + req.url);
+    });
 }

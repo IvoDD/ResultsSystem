@@ -145,11 +145,11 @@ function editResult(problem, id){
     hideInput();
     lastProblem = problem; lastId = id;
     let row = document.getElementById('z' + problem + id);
-    row.lastChild.innerHTML = "<form onsubmit='return updateRes(" +problem+ ", " +id+ ")' style='display:inline'>" +
-                              "<input type='number' min='0' max='10' id='currentResult' autofocus value='"+ parse2(competitors[id].p[problem-1]) +"'>" + 
-                              "<input type='submit' value='tickche'>" + 
-                              "</form>" + 
-                              "<button style='display:inline' onclick='hideInput();hiksche=1;'>hiksche</button>";
+    row.lastChild.innerHTML = "<form onsubmit='return updateRes(" +problem+ ", " +id+ ")' style='display:inline-block;height:30px;'>" +
+                              "<input style='display:inline;' type='number' min='0' max='10' id='currentResult' autofocus value='"+ parse2(competitors[id].p[problem-1]) +"'>" + 
+                              "<input type='image' src='/green_tick.png' alt='Submit' style='display:inline;height:30px;width:30px;'>" +
+                              "<input type='image' src='/red_cross.png' style='display:inline;height:30px;width:30px;' onclick='hideInput();hiksche=1;'>" +
+                              "</form>";
     document.getElementById('currentResult').select();
 }
 
