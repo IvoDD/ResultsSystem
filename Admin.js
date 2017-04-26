@@ -6,19 +6,21 @@ var key = "this is a random key";
 class Admin{
     constructor (connection, username, password, reg=0, callback){
         this.username = username;
+        //this.id = -1;
         if (reg){
             this.salt = Admin.genSalt(64);
             this.saltedHash = Admin.calcSaltedHash(password, this.salt);
-            connection.query("INSERT INTO users (username, salted_hash, salt) VALUES (?, ?, ?)", [this.username, this.saltedHash, this.salt], function(err){
+            connection.query("INSERT INTO admins (username, salted_hash, salt) VALUES (?, ?, ?)", [this.username, this.saltedHash, this.salt], function(err){
                 if (err){callback(false);}
                 else{callback(true);}
             });
         }else{
-            connection.query("SELECT * FROM users WHERE username = ?", this.username, function(err, rows, fields){
+            connection.query("SELECT * FROM admins WHERE username = ?", this.username, function(err, rows, fields){
                 if (err || rows.length == 0){callback(false); return;}
+                this.id = rows[0].id;
                 this.salt = rows[0].salt;
                 this.saltedHash = Admin.calcSaltedHash(password, this.salt);
-                callback(this.saltedHash == rows[0].salted_hash);
+                callback(this.saltedHash == rows[0].salted_hash, this.id);
             });
         }
     }

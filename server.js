@@ -1,7 +1,3 @@
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
 var mysql = require('mysql');
 
 var gets = require('./get_handler.js');
@@ -12,44 +8,52 @@ var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'jjkofajj',
-    database: 'cake_results_test'
-});
-var connAdmins = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'jjkofajj',
-    database: 'admins'
-});
-
-gets.handleGets(express, app);
-
-app.get('/', function(req, res){
-    res.sendFile(__dirname + "/views/index.html");
+    database: 'maths_results'
 });
 
 connection.connect();
-var comp = [];
-database.loadResults(connection, comp);
+var competitions = [];
+database.loadCompetitions(connection, competitions, () => {
 
-io.on('connection', function(socket){
-    let currentUser, valid = 0;
-    socket.emit('init', comp);
-    
-    socket.on('login', function (user){
-        currentUser = new Admin(connAdmins, user.username, user.password, 0, function (success){
-            socket.emit('login', success);
-            valid = success;
+database.loadResults(connection, competitions);
+for (let i=0; i<competitions.length; ++i){
+    let express = require('express');
+    let app = express();
+    let http = require('http').Server(app);
+    let io = require('socket.io')(http);
+
+    gets.handleGets(express, app);
+
+    app.get('/', function(req, res){
+        res.sendFile(__dirname + "/views/index.html");
+    });
+
+    //database.loadResults(connection, comp);
+
+    io.on('connection', function(socket){
+        let currentUser, valid = 0, admin_id = -1;
+        socket.emit('init', competitions[i].comp);
+
+        socket.on('login', function (user){
+            currentUser = new Admin(connection, user.username, user.password, 0, function (success, id){
+                socket.emit('login', success);
+                valid = success;
+                if (success){admin_id = id;}
+                else{admin_id = -1;}
+            });
+        });
+
+        socket.on('updateResult', function(id, problem, value){
+            if (!valid){return;}
+            competitions[i].comp[id].p[problem]=value;
+            io.emit('changeResult', competitions[i].comp[id]);
+            database.changeResult(connection, admin_id, id, competitions[i].prob[problem], value);
         });
     });
-    
-    socket.on('updateResult', function(id, problem, value){
-        if (!valid){return;}
-        comp[id].p[problem]=value;
-        io.emit('changeResult', comp[id])
-        database.changeResult(connection, id, problem, value, currentUser);
-    })
-});
 
-http.listen(3000, function(){
-    console.log("server started");
+    http.listen(competitions[i].port, function(){
+        console.log("server started on port " + competitions[i].port);
+    });
+}
+
 });
