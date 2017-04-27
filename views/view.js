@@ -1,29 +1,63 @@
 var lastActive = 'r';
 var blocks = {'r': "block_results",
-              'r1': "block_zad1",
-              'r2': "block_zad2",
-              'r3': "block_zad3",
-              'r4': "block_zad4",
-              'r5': "block_zad5",
-              'r6': "block_zad6",
-              'l': "block_login"};
+              'l': "block_login",
+              'c': "block_credits"};
 
-var lastProblem = 0, lastId = 0, hiksche = 0;
+var lastProblem = 0, lastId = 0, hiksche = 0, t=0;
 
 window.addEventListener('keydown', function(event){
     if (event.key=="Escape"){hideInput();}
-})
+});
+
+window.addEventListener('mousedown', function(event){
+    t = performance.now();
+});
+
+function setup(name, prob){
+    document.getElementById('competition_name').innerHTML = name;
+    for (let i=1; i<=prob; ++i){
+        blocks['r'+i]=('block_zad'+i);
+        
+        document.getElementById('c').insertAdjacentHTML('beforebegin', "<li id='r" + i +"'><a href='#" +i+ "' onclick='load(\"r" +i+ "\")'>Задача " +i+ "</a></li>");
+        
+        document.getElementById('overall').insertAdjacentHTML('beforebegin', "<th>Зад. " +i+ "</th>");
+        
+        document.getElementById('block_login').insertAdjacentHTML('beforebegin', 
+        '<div class="container" id="block_zad' +i+ '" style="display: none;">'+
+        '<div>' +
+        '<h1>Резултати по задача '+i+'</h1>' +
+        '<table class="table table-striped">' +
+            '<thead>' +
+              '<tr>' +
+                '<th>#</th>' +
+                '<th>Имена</th>' +
+                '<th>Зад. '+i+'</th>' +
+              '</tr>' +
+            '</thead>' +
+            '<tbody id="zad'+i+'">' +
+            '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '</div>');
+    }
+}
 
 function clear(){
     document.getElementById(lastActive).className="";
     document.getElementById(blocks[lastActive]).style.display = "none";
+    if (lastActive=='c'){document.getElementById('block_login').style.display = "none";}
 }
 
 function load(nav){
     clear();
     lastActive = nav;
     document.getElementById(nav).className="active";
-    document.getElementById(blocks[nav]).style.display = "block";
+    if (nav=='c' && performance.now()-t>1000){
+        document.getElementById('block_login').style.display = "block";
+    }
+    else{
+        document.getElementById(blocks[nav]).style.display = "block";
+    }
 }
 
 function num(result){
@@ -31,7 +65,7 @@ function num(result){
 }
 
 function renumber(res){
-    var last = res.firstChild.nextSibling, lastid = 1;
+    var last = res.firstChild, lastid = 1;
     var prev = last, curr = prev.nextSibling;
     
     for (let i=2; prev.lastChild != null; ++i){
@@ -58,23 +92,23 @@ function updatePos(competitor){
     var curr = document.getElementById('re' + competitor.id);
     var parent = curr.parentNode;
     var before = curr;
-    while (before.previousSibling.lastChild != null && num(before.previousSibling.lastChild.innerHTML) < competitor.overall){
+    while (before.previousSibling && before.previousSibling.lastChild != null && num(before.previousSibling.lastChild.innerHTML) < competitor.overall){
         before = before.previousSibling;
     }
     parent.insertBefore(curr, before);
     
-    for (let i=1; i<7; ++i){
+    for (let i=1; i<=numProblems; ++i){
         curr = document.getElementById('z' + i + competitor.id);
         parent = curr.parentNode;
         before = curr;
-        while (before.previousSibling.lastChild != null && (num(before.previousSibling.lastChild.innerHTML)) < competitor.p[i-1]){
+        while (before.previousSibling && before.previousSibling.lastChild != null && (num(before.previousSibling.lastChild.innerHTML)) < competitor.p[i-1]){
             before = before.previousSibling;
         }
         parent.insertBefore(curr, before);
     }
     
     renumber(document.getElementById('results'));
-    for (let i=1; i<7; ++i){
+    for (let i=1; i<=numProblems; ++i){
         renumber(document.getElementById('zad'+i));
     }
 }
@@ -94,7 +128,7 @@ function updateCompetitor(competitor){
     let row = document.getElementById('re' + competitor.id);
     let child = row.firstChild.nextSibling;
     child.innerHTML = competitor.name;
-    for (let i=0; i<6; ++i){
+    for (let i=0; i<numProblems; ++i){
         child = child.nextSibling;
         child.innerHTML = parse(competitor.p[i]);
         document.getElementById('z'+(i+1)+competitor.id).lastChild.innerHTML = parse(competitor.p[i]);
@@ -105,19 +139,16 @@ function updateCompetitor(competitor){
 
 function insertCompetitor(competitor){
     ++numComp;
-    document.getElementById('results').insertAdjacentHTML('beforeEnd', 
-                                        "<tr id = 're" + competitor.id + "'>" +
-                                        "<td>" + numComp + "</td>" +
-                                        "<td>" + competitor.name + "</td>" +
-                                        "<td>" + parse(competitor.p[0]) + "</td>" +
-                                        "<td>" + parse(competitor.p[1]) + "</td>" +
-                                        "<td>" + parse(competitor.p[2]) + "</td>" +
-                                        "<td>" + parse(competitor.p[3]) + "</td>" +
-                                        "<td>" + parse(competitor.p[4]) + "</td>" +
-                                        "<td>" + parse(competitor.p[5]) + "</td>" +
-                                        "<td>" + competitor.overall + "</td>" +
-                                        "</tr>");
-    for (let i=0; i<6; ++i){
+    let html = "<tr id = 're" + competitor.id + "'>" +
+               "<td>" + numComp + "</td>" +
+               "<td>" + competitor.name + "</td>";
+    for (let i=0; i<numProblems; ++i){
+        html += "<td>" + parse(competitor.p[i]) + "</td>";
+    }
+    html += "<td>" + competitor.overall + "</td>" + "</tr>";
+    document.getElementById('results').insertAdjacentHTML('beforeEnd', html);
+    
+    for (let i=0; i<numProblems; ++i){
         document.getElementById('zad'+(i+1)).insertAdjacentHTML('beforeEnd',
                                         "<tr id = 'z" + (i+1) + competitor.id + "'>" +
                                         "<td>" + numComp + "</td>" + 

@@ -32,7 +32,7 @@ for (let i=0; i<competitions.length; ++i){
 
     io.on('connection', function(socket){
         let currentUser, valid = 0, admin_id = -1;
-        socket.emit('init', competitions[i].comp);
+        socket.emit('init', competitions[i].name, competitions[i].comp, competitions[i].prob);
 
         socket.on('login', function (user){
             currentUser = new Admin(connection, user.username, user.password, 0, function (success, id){
