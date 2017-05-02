@@ -116,11 +116,11 @@ function updatePos(competitor){
 var numComp = 0;
 
 function parse(a){
-    if (a==undefined){return '-';}
+    if (a==undefined || a==-1){return '-';}
     return a;
 }
 function parse2(a){
-    if (a==undefined){return '';}
+    if (a==undefined || a==-1){return '';}
     return a;
 }
 
@@ -177,7 +177,7 @@ function editResult(problem, id){
     lastProblem = problem; lastId = id;
     let row = document.getElementById('z' + problem + id);
     row.lastChild.innerHTML = "<form onsubmit='return updateRes(" +problem+ ", " +id+ ")' style='display:inline-block;height:30px;'>" +
-                              "<input style='display:inline;' type='number' min='0' max='10' id='currentResult' autofocus value='"+ parse2(competitors[id].p[problem-1]) +"'>" + 
+                              "<input style='display:inline;' type='number' min='-1' max='10' id='currentResult' autofocus value='"+ parse2(competitors[id].p[problem-1]) +"'>" + 
                               "<input type='image' src='/green_tick.png' alt='Submit' style='display:inline;height:30px;width:30px;'>" +
                               "<input type='image' src='/red_cross.png' style='display:inline;height:30px;width:30px;' onclick='hideInput();hiksche=1;'>" +
                               "</form>";

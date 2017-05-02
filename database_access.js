@@ -49,6 +49,13 @@ exports.loadResults = function(connection, competitions){
     });
 }
 
+exports.addCompetitor = function(connection, name, grade, competition_id, callback){
+    connection.query("INSERT INTO competitors (name, grade, competition_id) VALUES (?, ?, ?)", [name, grade, competition_id], function(err, result){
+        if (err){return;}
+        callback(result.insertId);
+    });
+}
+
 exports.changeResult = function(connection, admin_id, competitor_id, problem_id, result){
     connection.query("INSERT INTO results (admin_id, competitor_id, problem_id, result) VALUES (?, ?, ?, ?)", [admin_id, competitor_id, problem_id, result]);
 }

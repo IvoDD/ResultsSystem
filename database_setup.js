@@ -31,7 +31,7 @@ var competitions = [new Competiton('5 клас', 6, 3005, 'grade5'),
                    new Competiton('9 клас', 6, 3009, 'grade9'),
                    new Competiton('10-12 клас', 6, 3010, 'grade10')];
 
-var competitors = xlsx.readFile('competitors2.xlsx');
+var competitors = xlsx.readFile('competitors3.xlsx');
 /*var problems = xlsx.readFile('problems.xlsx');*/
 
 connection.connect();
@@ -49,7 +49,7 @@ connection.query("SHOW DATABASES LIKE ?", dbName, function(err, rows, fields){
                     }
                     let curr = competitors.Sheets[competitions[i].sheet];
                     if (curr != undefined){
-                        for (let j=1; curr["A"+j] != undefined; ++j){
+                        for (let j=1; curr["A"+j] != undefined && curr["B"+j]!=undefined; ++j){
                             connection.query("INSERT INTO competitors (name, grade, competition_id) VALUES (?, ?, ?)", [curr['A'+j].v, curr['B'+j].v, i+1]);
                         }
                     }

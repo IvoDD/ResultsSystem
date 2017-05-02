@@ -4,15 +4,40 @@ var gets = require('./get_handler.js');
 var database = require('./database_access.js');
 var Admin = require('./Admin.js').Admin;
 
-var connection = mysql.createConnection({
+var db_config = {
     host: 'localhost',
     user: 'root',
     password: 'jjkofajj',
     database: 'maths_results'
-});
+};
+//var connection = mysql.createConnection(db_config);
+//connection.connect();
 
-connection.connect();
+var connection;
 var competitions = [];
+
+function handleDisconnect() {
+  connection = mysql.createConnection(db_config);
+
+  connection.connect(function(err) {
+    if(err) {
+      //console.log('error when connecting to db:', err);
+      setTimeout(handleDisconnect, 2000);
+    }
+  });
+
+  connection.on('error', function(err) {
+    //console.log('db error', err);
+    setTimeout(handleDisconnect, 2000); 
+  });
+}
+
+handleDisconnect();
+
+/*connection.on('error', () => {
+    setTimeout(() => {connection=mysql.createConnection(db_config);connection.connect();})
+});*/
+
 database.loadCompetitions(connection, competitions, () => {
 
 database.loadResults(connection, competitions);
@@ -48,6 +73,14 @@ for (let i=0; i<competitions.length; ++i){
             competitions[i].comp[id].p[problem]=value;
             io.emit('changeResult', competitions[i].comp[id]);
             database.changeResult(connection, admin_id, id, competitions[i].prob[problem], value);
+        });
+        
+        socket.on('addCompetitor', function(name, grade){
+            if (!valid){return;}
+            database.addCompetitor(connection, name, grade, competitions[i].id, (id) => {
+                competitions[i].comp[id] = new database.Competitor(id, name);
+                socket.emit('newCompetitor', competitions[i].comp[id]);
+            });
         });
     });
 
